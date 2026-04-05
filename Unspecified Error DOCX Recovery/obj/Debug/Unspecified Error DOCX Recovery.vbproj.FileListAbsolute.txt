@@ -1,0 +1,63 @@
+C:\Users\socrtwo\Documents\Visual Studio 2012\Projects\Unspecified Error DOCX Recovery\Unspecified Error DOCX Recovery\obj\Debug\Unspecified Error DOCX Recovery.vbprojResolveAssemblyReference.cache
+C:\Users\socrtwo\Documents\Visual Studio 2012\Projects\Unspecified Error DOCX Recovery\Unspecified Error DOCX Recovery\obj\Debug\WindowsApplication1.Form1.resources
+C:\Users\socrtwo\Documents\Visual Studio 2012\Projects\Unspecified Error DOCX Recovery\Unspecified Error DOCX Recovery\obj\Debug\WindowsApplication1.Resources.resources
+C:\Users\socrtwo\Documents\Visual Studio 2012\Projects\Unspecified Error DOCX Recovery\Unspecified Error DOCX Recovery\obj\Debug\Unspecified Error DOCX Recovery.vbproj.GenerateResource.Cache
+C:\Users\socrtwo\Documents\Visual Studio 2012\Projects\Unspecified Error DOCX Recovery\Unspecified Error DOCX Recovery\bin\Debug\Unspecified Error DOCX Recovery.exe
+C:\Users\socrtwo\Documents\Visual Studio 2012\Projects\Unspecified Error DOCX Recovery\Unspecified Error DOCX Recovery\bin\Debug\Unspecified Error DOCX Recovery.pdb
+C:\Users\socrtwo\Documents\Visual Studio 2012\Projects\Unspecified Error DOCX Recovery\Unspecified Error DOCX Recovery\bin\Debug\Unspecified Error DOCX Recovery.xml
+C:\Users\socrtwo\Documents\Visual Studio 2012\Projects\Unspecified Error DOCX Recovery\Unspecified Error DOCX Recovery\bin\Debug\Microsoft.Office.Interop.Word.dll
+C:\Users\socrtwo\Documents\Visual Studio 2012\Projects\Unspecified Error DOCX Recovery\Unspecified Error DOCX Recovery\bin\Debug\office.dll
+C:\Users\socrtwo\Documents\Visual Studio 2012\Projects\Unspecified Error DOCX Recovery\Unspecified Error DOCX Recovery\obj\Debug\Unspecified Error DOCX Recovery.exe
+C:\Users\socrtwo\Documents\Visual Studio 2012\Projects\Unspecified Error DOCX Recovery\Unspecified Error DOCX Recovery\obj\Debug\Unspecified Error DOCX Recovery.xml
+C:\Users\socrtwo\Documents\Visual Studio 2012\Projects\Unspecified Error DOCX Recovery\Unspecified Error DOCX Recovery\obj\Debug\Unspecified Error DOCX Recovery.pdb
+J:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\bin\Debug\Savvy DOCX Recovery.exe
+J:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\bin\Debug\Savvy DOCX Recovery.pdb
+J:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\bin\Debug\Savvy DOCX Recovery.xml
+J:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\obj\Debug\Unspecified Error DOCX Recovery.vbprojResolveAssemblyReference.cache
+J:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\obj\Debug\SavvyDOCXRecovery.AboutBox1.resources
+J:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\obj\Debug\SavvyDOCXRecovery.Form1.resources
+J:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\obj\Debug\SavvyDOCXRecovery.Resources.resources
+J:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\obj\Debug\Unspecified Error DOCX Recovery.vbproj.GenerateResource.Cache
+J:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\obj\Debug\Savvy DOCX Recovery.exe
+J:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\obj\Debug\Savvy DOCX Recovery.xml
+J:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\obj\Debug\Savvy DOCX Recovery.pdb
+J:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\bin\Debug\Savvy DOCX Recovery.exe.config
+J:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\bin\Debug\Microsoft.Office.Interop.Word.dll
+I:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\bin\Debug\Savvy DOCX Recovery.exe.config
+I:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\obj\Debug\Savvy DOCX Recovery.exe
+I:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\obj\Debug\Savvy DOCX Recovery.xml
+I:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\obj\Debug\Savvy DOCX Recovery.pdb
+I:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\bin\Debug\Savvy DOCX Recovery.exe
+I:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\bin\Debug\Savvy DOCX Recovery.pdb
+I:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\bin\Debug\Savvy DOCX Recovery.xml
+I:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\bin\Debug\Microsoft.Office.Interop.Word.dll
+I:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\obj\Debug\Unspecified Error DOCX Recovery.vbprojResolveAssemblyReference.cache
+I:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\obj\Debug\SavvyDOCXRecovery.AboutBox1.resources
+I:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\obj\Debug\SavvyDOCXRecovery.Form1.resources
+I:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\obj\Debug\SavvyDOCXRecovery.Resources.resources
+I:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\obj\Debug\Unspecified Error DOCX Recovery.vbproj.GenerateResource.Cache
+D:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\bin\Debug\Savvy DOCX Recovery.exe.config
+D:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\obj\Debug\Savvy DOCX Recovery.exe
+D:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\obj\Debug\Savvy DOCX Recovery.xml
+D:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\obj\Debug\Savvy DOCX Recovery.pdb
+D:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\bin\Debug\Savvy DOCX Recovery.exe
+D:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\bin\Debug\Savvy DOCX Recovery.pdb
+D:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\bin\Debug\Savvy DOCX Recovery.xml
+D:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\bin\Debug\Microsoft.Office.Interop.Word.dll
+D:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\obj\Debug\Unspecified Error DOCX Recovery.vbprojResolveAssemblyReference.cache
+D:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\obj\Debug\SavvyDOCXRecovery.AboutBox1.resources
+D:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\obj\Debug\SavvyDOCXRecovery.Form1.resources
+D:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\obj\Debug\SavvyDOCXRecovery.Resources.resources
+D:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\obj\Debug\Unspecified Error DOCX Recovery.vbproj.GenerateResource.Cache
+C:\Work\Savkic\version2.0setup\Unspecified Error DOCX Recovery\bin\Debug\Savvy DOCX Recovery.exe.config
+C:\Work\Savkic\version2.0setup\Unspecified Error DOCX Recovery\bin\Debug\Savvy DOCX Recovery.exe
+C:\Work\Savkic\version2.0setup\Unspecified Error DOCX Recovery\bin\Debug\Savvy DOCX Recovery.pdb
+C:\Work\Savkic\version2.0setup\Unspecified Error DOCX Recovery\bin\Debug\Savvy DOCX Recovery.xml
+C:\Work\Savkic\version2.0setup\Unspecified Error DOCX Recovery\bin\Debug\Microsoft.Office.Interop.Word.dll
+C:\Work\Savkic\version2.0setup\Unspecified Error DOCX Recovery\obj\Debug\SavvyDOCXRecovery.AboutBox1.resources
+C:\Work\Savkic\version2.0setup\Unspecified Error DOCX Recovery\obj\Debug\SavvyDOCXRecovery.Form1.resources
+C:\Work\Savkic\version2.0setup\Unspecified Error DOCX Recovery\obj\Debug\SavvyDOCXRecovery.Resources.resources
+C:\Work\Savkic\version2.0setup\Unspecified Error DOCX Recovery\obj\Debug\Unspecified Error DOCX Recovery.vbproj.GenerateResource.Cache
+C:\Work\Savkic\version2.0setup\Unspecified Error DOCX Recovery\obj\Debug\Savvy DOCX Recovery.exe
+C:\Work\Savkic\version2.0setup\Unspecified Error DOCX Recovery\obj\Debug\Savvy DOCX Recovery.xml
+C:\Work\Savkic\version2.0setup\Unspecified Error DOCX Recovery\obj\Debug\Savvy DOCX Recovery.pdb

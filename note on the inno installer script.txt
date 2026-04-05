@@ -1,0 +1,1 @@
+Note you will have to change the paths in the Inno setup file. Note the script allowing the application path to be part of the System path, comes from here: http://www.legroom.net/software/modpath.

@@ -1,0 +1,25 @@
+                   ***Savvy DOCX Recovery for Word 2.0.4 - 11/09/2013***
+
+Note - the current version 2.0.4. Current major problems with version 2 appear to be fixed. These include encoding issues, the text extraction choice not working from the menu or after extraction and other minor issues.
+
+This version started when I discovered an algorithm listed by Daniel "3ICE" Berezvai, here: http://bit.ly/3ICE-DBerezvai for recovering a small subset of corrupt DOCX files where the error is "Unspecified" and the location is given as "Line 2, column 0". In the past Savvy DOCX recovery worked by truncating the constituent XML subfiles of the DOCX at the first sign of XML corruption and then adding the correct ending tags with xmllint. Daniel’s suggestion showed me how to move forward and fix the XML instead of just truncating it. I subsequently discovered that when using Word 2007 instead of Word 2010 or 2013, the XML errors of the unspecified type, list the column number, so perhaps all users reporting unspecified error corruption can be helped with Corrupt DOCX Recovery whether there is column number listed for them or not.
+
+Not long after that I discovered on similar Microsoft community threads, steps to also do minor surgery on corrupt Word files of the error variety: “The name in the end tag of the element must match the element type in the start tag”. Most these simply require a reordering of <m:oMath> tags so that they immediately precede <mc:AlternateContent> tags instead of following them two lines later.
+
+In this version of Savvy DOCX Recovery, I also revisited xmllint. I have now 50 or so corrupt Word file that are repairable and I found that sometimes treating the corrupt XML subfiles with the xmllint –recover command was enough to be accepted by Word. In the past I had believed that xmllint was only good for fixing the end tags on corrupt XML subfiles, now it is apparent that they are a good second line of attack if the unspecified and end tag treatments don’t work or don’t apply.
+
+My third line of attack remains the method of truncating the subfile at the first XML error. What’s different in this version is I have given up using a strict XML validator for determining where the first error is and now use Word itself to tell me. Actually I only do this for the document.xml file. For the other subfiles, I use the “lax” xml validator from Savvy Office Recovery. I have also given up doing “transplants” of the document.xml file into new healthy blanks and simply do a straight forward truncation at the error then adding the correct XML end tags with xmllint.
+
+My last line of attack is to use SilverCoder’s DocToText to extract the text. I offer the option even if an openable version of the DOCX is produced. I offer two different configuration here, one with the –fix-xml command and the second that shows no formatting whatsoever, the –strip-xml command.
+
+Finally to start with I use Marcello Pontello’s TRID (see http://mark0.net/soft-trid-e.html) identifying program to see if the file is really a DOCX one. If it is a DOC, RTF or Microsoft Word Writer WPS extension instead, I try to extract the text of those files with SilverCoder’s DocToText.
+
+Note, I'm also the author of programs at http://sourceforge.net/users/socrtwo22 which will do docx recovery but at least half of these programs use algorithms which are nonspecific and will truncate your file at the first XML error in the name of getting the file to open and recovering at least something. The rest of the programs might recover the text alone, without formatting. This present program is my first foray into doing more surgical removal of corrupt code found in the document.xml file where all the text is stored. This is my first attempt to leave both the beginning and endings of files intact and just removing a small bit of corrupt interior XML. 
+
+If this program doesn't work, ask Daniel or other Microsoft MVPs accessible through the button links to see if they can help. There is also a button link for my service. I charge $22 with a 2 - 5 hour turnaround time, but I will refund you $17 if I'm unsuccessful or the work is unsatisfactory. I also have links to Hotfixes and Service Pack, which will prevent many types of Word corruption from occurring in the first place.
+
+Note, DOCX files are in reality conventionally zipped packages of mostly xml subfiles with all of the text stored in the document.xml subfile. Word will refuse to open files with document.xml and sometimes style.xml corruption. Even my truncating programs will preserve all the text and some formatting if the reason for the file not opening is a corrupt styles.xml file, but these are rare.
+
+                                           **Contact**
+
+My name is Paul Pruitt. My Email address is socrtwo@s2services.com if you want to send me a file. I also have website which lists most of the freeware available on the web for recovery of data from file corruption, unwanted file deletions, failing disks and lost passwords: http://s2services.com. An even wider assortment of data recovery freeware is listed on my blog: http://free-data-recovery.blogspot.com/.

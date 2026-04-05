@@ -1,0 +1,13 @@
+J:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\bin\x64\Debug\Savvy DOCX Recovery.exe
+J:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\bin\x64\Debug\Savvy DOCX Recovery.pdb
+J:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\bin\x64\Debug\Savvy DOCX Recovery.xml
+J:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\bin\x64\Debug\Karna.Compression.dll
+J:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\bin\x64\Debug\Microsoft.Office.Interop.Word.dll
+J:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\bin\x64\Debug\Karna.Compression.pdb
+J:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\obj\x64\Debug\SavvyDOCXRecovery.AboutBox1.resources
+J:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\obj\x64\Debug\SavvyDOCXRecovery.Form1.resources
+J:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\obj\x64\Debug\SavvyDOCXRecovery.Resources.resources
+J:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\obj\x64\Debug\Unspecified Error DOCX Recovery.vbproj.GenerateResource.Cache
+J:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\obj\x64\Debug\Savvy DOCX Recovery.exe
+J:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\obj\x64\Debug\Savvy DOCX Recovery.xml
+J:\Documents\Visual Studio 2012\Projects\Savvy Corrupt DOCX Recovery\version2.0setup\Unspecified Error DOCX Recovery\obj\x64\Debug\Savvy DOCX Recovery.pdb

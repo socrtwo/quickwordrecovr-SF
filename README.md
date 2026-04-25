@@ -1,5 +1,10 @@
 # Savvy DOCX Recovery
 
+<!--PAGES_LINK_BANNER-->
+> 🌐 **Live page:** [https://socrtwo.github.io/quickwordrecovr-SF/](https://socrtwo.github.io/quickwordrecovr-SF/)  
+> 📦 **Releases:** [github.com/socrtwo/quickwordrecovr-SF/releases](https://github.com/socrtwo/quickwordrecovr-SF/releases)
+<!--/PAGES_LINK_BANNER-->
+
 Performs precise XML surgery on corrupt Word DOCX files. Uses xmllint for repair and truncation, with a fallback to DocToText for plain text extraction.
 
 ## Screenshots

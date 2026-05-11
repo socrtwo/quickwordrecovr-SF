@@ -3,13 +3,14 @@
  * shell, network-first for everything else. Bumps the cache name on each
  * release so old assets get evicted.
  */
-const CACHE = 'qwr-v1';
+const CACHE = 'qwr-v2';
 const SHELL = [
   './',
   'index.html',
   'about.html',
   'app.css',
   'app.js',
+  'immortal-inflate.js',
   'manifest.webmanifest',
   'icons/icon.svg',
   'icons/icon-192.png',

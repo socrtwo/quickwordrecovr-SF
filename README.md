@@ -17,12 +17,19 @@
 ## What it does
 
 When Microsoft Word reports *"unspecified error"* opening a `.docx`, the file's
-internal `word/document.xml` is usually truncated or malformed. Quick Word Recovr:
+internal `word/document.xml` is usually truncated or malformed — or the ZIP
+container itself is damaged. Quick Word Recovr:
 
-1. Treats the `.docx` as a ZIP archive and reads `word/document.xml`.
-2. Validates the XML and locates the last well-formed paragraph.
-3. Rebuilds a clean document with proper closing tags.
-4. Repacks the archive — or extracts plain text as a fallback.
+1. Treats the `.docx` as a ZIP archive and reads `word/document.xml` with JSZip.
+2. If JSZip refuses the archive or can't decompress a corrupt DEFLATE entry,
+   falls back to the **Immortal Inflater** — a fault-tolerant DEFLATE decoder
+   (vendored from
+   [Universal-File-Repair-Tool](https://github.com/socrtwo/Universal-File-Repair-Tool))
+   that continues past corrupted blocks and returns partial data instead of
+   failing.
+3. Validates the XML and locates the last well-formed paragraph.
+4. Rebuilds a clean document with proper closing tags.
+5. Repacks the archive — or extracts plain text as a fallback.
 
 The web app does all of this **locally in your browser**. Files are never uploaded.
 
@@ -50,6 +57,7 @@ using [JSZip](https://stuk.github.io/jszip/) and the browser's native XML parser
 │   ├── index.html                      DOCX recovery tool
 │   ├── about.html                      README-driven landing
 │   ├── app.js, app.css                 App logic + styles
+│   ├── immortal-inflate.js             Fault-tolerant DEFLATE decoder fallback
 │   ├── manifest.webmanifest, sw.js     PWA manifest + offline service worker
 │   └── icons/                          App icons (SVG + PNG)
 ├── setupVII-without-adware-offers.iss  Inno Setup installer script

@@ -55,12 +55,17 @@
     <section class="card subtle">
       <h3>How it works</h3>
       <p>A <code>.docx</code> file is a ZIP archive of XML parts. When Word reports <em>"unspecified error"</em>, the
-      most common cause is truncated or malformed XML in <code>word/document.xml</code>. This tool:</p>
+      most common cause is truncated or malformed XML in <code>word/document.xml</code> — or a damaged ZIP
+      container that prevents Word from even opening the file. This tool:</p>
       <ol>
-        <li>Unpacks the DOCX in memory using JSZip.</li>
+        <li>Unpacks the DOCX in memory using JSZip — and, if JSZip refuses the archive or can't decompress a
+        corrupt DEFLATE entry, falls back to the <strong>Immortal Inflater</strong>: a fault-tolerant DEFLATE
+        decoder (from
+        <a href="https://github.com/socrtwo/Universal-File-Repair-Tool" target="_blank" rel="noopener">Universal-File-Repair-Tool</a>)
+        that continues past corrupted blocks and returns partial data instead of failing.</li>
         <li>Validates <code>word/document.xml</code> with the browser's XML parser.</li>
-        <li>If invalid, locates the last well-formed paragraph (<code>&lt;/w:p&gt;</code>) and rebuilds a clean
-        document with proper closing tags.</li>
+        <li>If invalid or only partially decoded, locates the last well-formed paragraph
+        (<code>&lt;/w:p&gt;</code>) and rebuilds a clean document with proper closing tags.</li>
         <li>Repacks the archive and lets you download the recovered <code>.docx</code> or extract plain text.</li>
       </ol>
       <p class="small">Recovery is best-effort. For severely damaged files, save the plain-text export and rebuild
@@ -85,6 +90,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="immortal-inflate.js"></script>
 <script src="app.js"></script>
 <script>
 if ('serviceWorker' in navigator) {

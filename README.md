@@ -1,99 +1,104 @@
-<!--MODERNIZED:v1-->
-# Quickwordrecovr
+<!--MODERNIZED:v2-->
+# Quick Word Recovr
 
-> Migrated from SourceForge via SF2GH Migrator
+> Cross-platform DOCX recovery. Originally a Windows-only tool migrated from SourceForge; now also available as a fully offline web/PWA app for every major platform.
 
-[![Live page](https://img.shields.io/badge/live-page-ff2e93?style=for-the-badge)](https://socrtwo.github.io/quickwordrecovr-SF/)
+[![Live app](https://img.shields.io/badge/live-app-ff2e93?style=for-the-badge)](https://socrtwo.github.io/quickwordrecovr-SF/)
 [![Releases](https://img.shields.io/github/v/release/socrtwo/quickwordrecovr-SF?style=for-the-badge&color=7c3aed)](https://github.com/socrtwo/quickwordrecovr-SF/releases)
 [![License](https://img.shields.io/github/license/socrtwo/quickwordrecovr-SF?style=for-the-badge&color=22d3ee)](https://github.com/socrtwo/quickwordrecovr-SF/blob/main/LICENSE)
 [![Last commit](https://img.shields.io/github/last-commit/socrtwo/quickwordrecovr-SF?style=for-the-badge&color=34d399)](https://github.com/socrtwo/quickwordrecovr-SF/commits)
 
-🌐 **Live:** https://socrtwo.github.io/quickwordrecovr-SF/  
-📦 **Downloads:** [Releases](https://github.com/socrtwo/quickwordrecovr-SF/releases)  
-📂 **Source:** [socrtwo/quickwordrecovr-SF](https://github.com/socrtwo/quickwordrecovr-SF)
+**Live app:** https://socrtwo.github.io/quickwordrecovr-SF/
+**Downloads:** [Releases](https://github.com/socrtwo/quickwordrecovr-SF/releases)
+**Source:** [socrtwo/quickwordrecovr-SF](https://github.com/socrtwo/quickwordrecovr-SF)
 
 ---
 
-Performs precise XML surgery on corrupt Word DOCX files. Uses xmllint for repair and truncation, with a fallback to DocToText for plain text extraction.
+## What it does
 
-## Screenshots
+When Microsoft Word reports *"unspecified error"* opening a `.docx`, the file's
+internal `word/document.xml` is usually truncated or malformed. Quick Word Recovr:
 
-Visit the [SourceForge project page](https://sourceforge.net/projects/quickwordrecovr/) to view screenshots.
+1. Treats the `.docx` as a ZIP archive and reads `word/document.xml`.
+2. Validates the XML and locates the last well-formed paragraph.
+3. Rebuilds a clean document with proper closing tags.
+4. Repacks the archive — or extracts plain text as a fallback.
 
-> **Tip:** If you have screenshots to contribute, open a PR adding them to a `screenshots/` folder!
+The web app does all of this **locally in your browser**. Files are never uploaded.
 
-**Language:** Delphi / Perl  
-**License:** MIT
+## Platforms
 
-## Features
+| Platform                | Format                            | How to install                                              |
+| ----------------------- | --------------------------------- | ----------------------------------------------------------- |
+| **Web**                 | hosted PWA                        | Open the [live app](https://socrtwo.github.io/quickwordrecovr-SF/) |
+| **Windows**             | `.exe` + Inno Setup installer     | Download from [Releases](../../releases)                    |
+| **macOS**               | PWA bundle (`.zip`)               | Extract, open `index.html`, or install via browser          |
+| **Linux**               | PWA bundle (`.zip`)               | Extract and serve, or install as PWA from the live site     |
+| **ChromeOS**            | PWA                               | Open the live app, then *Install* from the address bar      |
+| **Android**             | PWA bundle (`.zip`) / installable | Open the live app in Chrome, then *Add to Home screen*      |
+| **iOS / iPadOS**        | PWA bundle (`.zip`) / installable | Open the live app in Safari, then *Share → Add to Home Screen* |
 
-- Targeted XML repair inside DOCX archives
-- Uses xmllint for validation and truncation
-- Configurable truncation offset for fine-tuning
-- Fallback text extraction via DocToText
+The web app works **fully offline** once installed — recovery runs in JavaScript
+using [JSZip](https://stuk.github.io/jszip/) and the browser's native XML parser.
 
-## System Requirements
+## Repository layout
 
-- Windows XP or later
-- Delphi 7 (for original build) or Free Pascal / Lazarus (free alternative)
-
-## Installation & Usage
-
-### Building from Source (Delphi 7)
-
-1. Open the `.dpr` project file in Delphi 7
-2. Press **F9** to compile and run
-
-### Building with Free Pascal (free alternative)
-
-```bash
-sudo apt-get install fpc    # Linux
-# or download from https://www.freepascal.org/
-fpc -Sd src/*.pas
+```
+.
+├── Unspecified Error DOCX Recovery/   VB.NET WinForms source (.NET Framework 4.8)
+├── web/                                Cross-platform PWA (JS/HTML/CSS)
+│   ├── index.html                      DOCX recovery tool
+│   ├── about.html                      README-driven landing
+│   ├── app.js, app.css                 App logic + styles
+│   ├── manifest.webmanifest, sw.js     PWA manifest + offline service worker
+│   └── icons/                          App icons (SVG + PNG)
+├── setupVII-without-adware-offers.iss  Inno Setup installer script
+├── releases/                           Legacy SourceForge archives
+└── .github/workflows/                  Build / Pages / Release CI
 ```
 
-### Using a Pre-built Release
+## Building
 
-Download the latest release from the [Releases](../../releases) page.
+### Windows (VB.NET)
+
+Requires Visual Studio 2019+ or MSBuild with .NET Framework 4.8 SDK.
+
+```powershell
+nuget restore "Unspecified Error DOCX Recovery.sln"
+msbuild "Unspecified Error DOCX Recovery.sln" /p:Configuration=Release
+```
+
+The CI workflow (`.github/workflows/build.yml`) builds this on every push.
+
+### Web / PWA
+
+No build step. Serve the `web/` directory with any static HTTP server:
+
+```bash
+cd web && python3 -m http.server 8080
+```
+
+Then open <http://localhost:8080/>.
+
+### Installer (Inno Setup)
+
+`setupVII-without-adware-offers.iss` produces a Windows installer.
 
 ## Origin
 
-This project was originally hosted on SourceForge and has been migrated to GitHub for easier access and collaboration.
+Originally hosted on SourceForge and migrated to GitHub.
 
-- **SourceForge:** [quickwordrecovr](https://sourceforge.net/projects/quickwordrecovr/)
-- **Migrated with:** [SF2GH Migrator](https://github.com/socrtwo/sf-to-github)
+- **SourceForge:** https://sourceforge.net/projects/quickwordrecovr/
+- **Migration tool:** [SF2GH Migrator](https://github.com/socrtwo/sf-to-github)
 
 ## Contributing
 
-Contributions are welcome! Feel free to:
-
-1. Fork this repository
-2. Create a feature branch (`git checkout -b my-feature`)
-3. Commit your changes (`git commit -m "Add my feature"`)
-4. Push to the branch (`git push origin my-feature`)
-5. Open a Pull Request
+Issues and pull requests welcome at
+<https://github.com/socrtwo/quickwordrecovr-SF/issues>.
 
 ## License
 
-MIT License — see [LICENSE](LICENSE) for details.
-
----
-
-## 📜 SourceForge heritage
-
-This project originated on **SourceForge** before being migrated to GitHub. The legacy SourceForge entry, if still available, can be searched at:
-
-🔗 https://sourceforge.net/projects/quickwordrecovr/
-
-The repository here at `socrtwo/quickwordrecovr-SF` is the canonical, actively-maintained home. All future updates, issue tracking, and releases happen on GitHub.
-
-## 🛠️ Contributing
-
-Issues and pull requests are welcome at [https://github.com/socrtwo/quickwordrecovr-SF/issues](https://github.com/socrtwo/quickwordrecovr-SF/issues).
-
-## 📝 License
-
-See the [LICENSE](https://github.com/socrtwo/quickwordrecovr-SF/blob/main/LICENSE) file in this repository. If no license file is present, the project is shared as-is for reference and personal use; please contact the maintainer for other use cases.
+MIT — see [LICENSE](LICENSE).
 
 ---
 

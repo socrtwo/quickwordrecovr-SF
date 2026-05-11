@@ -1,0 +1,183 @@
+name: Release (multi-platform)
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release (e.g. v3.1.0)'
+        required: true
+        default: 'v3.1.0'
+
+permissions:
+  contents: write
+
+jobs:
+  # Build the Windows VB.NET binary.
+  windows:
+    name: Build Windows binary
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: microsoft/setup-msbuild@v2
+      - uses: NuGet/setup-nuget@v2
+
+      - name: Restore NuGet packages
+        run: nuget restore "Unspecified Error DOCX Recovery.sln"
+        continue-on-error: true
+
+      - name: Build (Release / Any CPU)
+        run: msbuild "Unspecified Error DOCX Recovery.sln" /p:Configuration=Release /p:Platform="Any CPU" /m
+        continue-on-error: true
+
+      - name: Locate build output
+        id: locate
+        shell: pwsh
+        run: |
+          $exe = Get-ChildItem -Recurse -Filter "Savvy DOCX Recovery.exe" -ErrorAction SilentlyContinue |
+                 Where-Object { $_.FullName -match 'bin\\Release' } |
+                 Select-Object -First 1
+          if ($exe) {
+            "exe_dir=$($exe.Directory.FullName)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+            "found=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          } else {
+            "found=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          }
+
+      - name: Package Windows ZIP
+        if: steps.locate.outputs.found == 'true'
+        shell: pwsh
+        run: |
+          $dir = "${{ steps.locate.outputs.exe_dir }}"
+          $out = "$env:GITHUB_WORKSPACE\quickwordrecovr-windows.zip"
+          Compress-Archive -Path "$dir\*" -DestinationPath $out -Force
+          Get-Item $out | Format-List
+
+      - name: Upload Windows artifact
+        if: steps.locate.outputs.found == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: quickwordrecovr-windows
+          path: quickwordrecovr-windows.zip
+          if-no-files-found: warn
+
+  # Package the web app for every other platform. Single web codebase, multiple
+  # named bundles so each release asset matches what users expect to download.
+  web-bundles:
+    name: Package web/PWA bundles
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify web/ exists
+        run: test -d web && ls web/
+
+      - name: Build platform bundles
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          # All non-Windows platforms ship the same PWA bundle; differing names
+          # make discovery in the Releases UI obvious. Each archive is
+          # standalone and works offline (open index.html in a browser).
+          for plat in macos linux chromeos android ios web; do
+            stage="dist/_stage_${plat}"
+            mkdir -p "$stage"
+            cp -r web/. "$stage/"
+            # Per-platform install notes.
+            cat > "$stage/INSTALL.txt" <<EOF
+          Quick Word Recovr — ${plat} bundle
+          ===================================
+
+          This bundle is a Progressive Web App. It is a single static folder; no
+          build step or server is required for local use.
+
+          QUICK START
+          -----------
+          1. Open index.html in any modern browser, OR
+          2. Serve the folder with a static HTTP server, OR
+          3. Use the hosted version:
+             https://socrtwo.github.io/quickwordrecovr-SF/
+
+          INSTALL AS AN APP
+          -----------------
+          - Windows / macOS / Linux / ChromeOS: open the live URL, then click
+            the install icon in the browser address bar (Chrome, Edge, Brave).
+          - Android: open the live URL in Chrome, then Menu → Add to Home screen.
+          - iOS / iPadOS: open the live URL in Safari, then Share → Add to
+            Home Screen.
+
+          OFFLINE
+          -------
+          Once installed (or once the live URL has been opened once with a
+          service-worker-capable browser), the app works fully offline.
+          EOF
+            (cd "$stage" && zip -qr "../quickwordrecovr-${plat}.zip" .)
+            rm -rf "$stage"
+          done
+          ls -la dist/
+
+      - name: Upload web bundles
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-bundles
+          path: dist/quickwordrecovr-*.zip
+          if-no-files-found: error
+
+  publish:
+    name: Publish GitHub Release
+    needs: [windows, web-bundles]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Collect release files
+        id: collect
+        run: |
+          set -euo pipefail
+          mkdir -p release
+          find artifacts -name 'quickwordrecovr-*.zip' -exec cp -v {} release/ \;
+          ls -la release/
+
+      - name: Determine tag
+        id: tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "ref=${{ inputs.tag }}" >> $GITHUB_OUTPUT
+          else
+            echo "ref=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create / update GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.ref }}
+          name: ${{ steps.tag.outputs.ref }}
+          generate_release_notes: true
+          files: release/*.zip
+          fail_on_unmatched_files: false
+          body: |
+            ## Quick Word Recovr — ${{ steps.tag.outputs.ref }}
+
+            Multi-platform release. Pick the bundle for your platform:
+
+            | Platform | Asset |
+            |---|---|
+            | Windows | `quickwordrecovr-windows.zip` (native VB.NET build) |
+            | macOS | `quickwordrecovr-macos.zip` (PWA bundle) |
+            | Linux | `quickwordrecovr-linux.zip` (PWA bundle) |
+            | ChromeOS | `quickwordrecovr-chromeos.zip` (PWA bundle) |
+            | Android | `quickwordrecovr-android.zip` (PWA bundle) |
+            | iOS / iPadOS | `quickwordrecovr-ios.zip` (PWA bundle) |
+            | Web | `quickwordrecovr-web.zip` — or use the [live app](https://socrtwo.github.io/quickwordrecovr-SF/) |
+
+            All PWA bundles contain the same offline-capable web app. Open
+            `index.html` directly or install it via your browser (see
+            `INSTALL.txt` in each archive).

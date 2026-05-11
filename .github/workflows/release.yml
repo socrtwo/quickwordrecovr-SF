@@ -1,0 +1,187 @@
+name: Release (multi-platform)
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release (e.g. v3.1.0)'
+        required: true
+        default: 'v3.1.0'
+
+permissions:
+  contents: write
+
+jobs:
+  # Try to produce a fresh Windows build; not required for the release to
+  # succeed since a prebuilt bin/Release is committed to the repo.
+  windows-build:
+    name: (Optional) Fresh Windows MSBuild
+    runs-on: windows-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: microsoft/setup-msbuild@v2
+      - uses: NuGet/setup-nuget@v2
+
+      - name: Restore NuGet packages
+        run: nuget restore "Unspecified Error DOCX Recovery.sln"
+        continue-on-error: true
+
+      - name: Build (Release / Any CPU)
+        run: msbuild "Unspecified Error DOCX Recovery.sln" /p:Configuration=Release /p:Platform="Any CPU" /m
+        continue-on-error: true
+
+      - name: Upload fresh Windows build (if produced)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-fresh-build
+          path: "Unspecified Error DOCX Recovery/bin/Release/Savvy DOCX Recovery.exe"
+          if-no-files-found: ignore
+
+  bundles:
+    name: Package all platform bundles
+    runs-on: ubuntu-latest
+    needs: [windows-build]
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download fresh Windows build (optional)
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-fresh-build
+          path: fresh-windows
+        continue-on-error: true
+
+      - name: Stage Windows bundle (prefer fresh build, fall back to prebuilt)
+        run: |
+          set -euo pipefail
+          stage="dist-stage/windows"
+          mkdir -p "$stage"
+          cp -r "Unspecified Error DOCX Recovery/bin/Release/." "$stage/"
+          if [ -f "fresh-windows/Savvy DOCX Recovery.exe" ]; then
+            cp "fresh-windows/Savvy DOCX Recovery.exe" "$stage/"
+            echo "Using freshly built exe"
+          else
+            echo "Using prebuilt exe checked into repo"
+          fi
+          cat > "$stage/INSTALL.txt" <<'EOF'
+          Quick Word Recovr — Windows bundle
+          ===================================
+          Run "Savvy DOCX Recovery.exe" directly. No installer required.
+
+          The bundle includes the helper utilities (xmllint, 7z, zip, trunc,
+          coffec, trid, no-frills) and dependent DLLs that the original app
+          shells out to during recovery.
+
+          For an installer build, see setupVII-without-adware-offers.iss in
+          the source repository (Inno Setup).
+          EOF
+
+      - name: Build platform bundles
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          # Windows: zip the staged native build directory.
+          (cd dist-stage/windows && zip -qr "../../dist/quickwordrecovr-windows.zip" .)
+
+          # All non-Windows platforms ship the same offline-capable PWA bundle;
+          # distinct names make discovery in the Releases UI obvious. Each
+          # archive is standalone — open index.html or install as a PWA.
+          for plat in macos linux chromeos android ios web; do
+            stage="dist-stage/${plat}"
+            mkdir -p "$stage"
+            cp -r web/. "$stage/"
+            cat > "$stage/INSTALL.txt" <<EOF
+          Quick Word Recovr — ${plat} bundle
+          ===================================
+
+          This bundle is a Progressive Web App. It is a single static folder; no
+          build step or server is required for local use.
+
+          QUICK START
+          -----------
+          1. Open index.html in any modern browser, OR
+          2. Serve the folder with a static HTTP server, OR
+          3. Use the hosted version:
+             https://socrtwo.github.io/quickwordrecovr-SF/
+
+          INSTALL AS AN APP
+          -----------------
+          - Windows / macOS / Linux / ChromeOS: open the live URL, then click
+            the install icon in the browser address bar (Chrome, Edge, Brave).
+          - Android: open the live URL in Chrome, then Menu -> Add to Home screen.
+          - iOS / iPadOS: open the live URL in Safari, then Share -> Add to
+            Home Screen.
+
+          OFFLINE
+          -------
+          Once installed (or once the live URL has been opened once with a
+          service-worker capable browser), the app works fully offline.
+          EOF
+            (cd "$stage" && zip -qr "../../dist/quickwordrecovr-${plat}.zip" .)
+          done
+          ls -la dist/
+
+      - name: Upload all bundles
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-bundles
+          path: dist/quickwordrecovr-*.zip
+          if-no-files-found: error
+
+  publish:
+    name: Publish GitHub Release
+    needs: [bundles]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download bundles
+        uses: actions/download-artifact@v4
+        with:
+          name: release-bundles
+          path: release
+
+      - name: List release files
+        run: ls -la release/
+
+      - name: Determine tag
+        id: tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "ref=${{ inputs.tag }}" >> $GITHUB_OUTPUT
+          else
+            echo "ref=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create / update GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.ref }}
+          name: ${{ steps.tag.outputs.ref }}
+          generate_release_notes: true
+          files: release/*.zip
+          fail_on_unmatched_files: true
+          body: |
+            ## Quick Word Recovr — ${{ steps.tag.outputs.ref }}
+
+            Multi-platform release. Pick the bundle for your platform:
+
+            | Platform | Asset |
+            |---|---|
+            | Windows | `quickwordrecovr-windows.zip` (native VB.NET build + helper utilities) |
+            | macOS | `quickwordrecovr-macos.zip` (PWA bundle) |
+            | Linux | `quickwordrecovr-linux.zip` (PWA bundle) |
+            | ChromeOS | `quickwordrecovr-chromeos.zip` (PWA bundle) |
+            | Android | `quickwordrecovr-android.zip` (PWA bundle) |
+            | iOS / iPadOS | `quickwordrecovr-ios.zip` (PWA bundle) |
+            | Web | `quickwordrecovr-web.zip` — or use the [live app](https://socrtwo.github.io/quickwordrecovr-SF/) |
+
+            All non-Windows bundles contain the same offline-capable web app.
+            Open `index.html` directly or install it via your browser (see
+            `INSTALL.txt` in each archive).

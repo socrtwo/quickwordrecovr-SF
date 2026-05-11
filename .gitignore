@@ -26,3 +26,7 @@ ehthumbs.db
 # Config with credentials
 config.php
 cookiefile
+
+# Release build artifacts
+/dist/
+

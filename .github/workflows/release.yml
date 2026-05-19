@@ -5,23 +5,26 @@ on:
     tags: ['v*']
   workflow_dispatch:
     inputs:
+      ref:
+        description: 'Git ref (tag/branch/SHA) to build from. Empty = current ref.'
+        required: false
+        default: ''
       tag:
-        description: 'Tag to release (e.g. v3.1.0)'
+        description: 'Release tag to publish to (e.g. v3.1.1)'
         required: true
-        default: 'v3.1.0'
+        default: 'v3.1.1'
 
 permissions:
   contents: write
 
 jobs:
-  # Try to produce a fresh Windows build; not required for the release to
-  # succeed since a prebuilt bin/Release is committed to the repo.
   windows-build:
-    name: (Optional) Fresh Windows MSBuild
+    name: Windows build, sign, and package
     runs-on: windows-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref || github.ref }}
 
       - uses: microsoft/setup-msbuild@v2
       - uses: NuGet/setup-nuget@v2
@@ -34,41 +37,13 @@ jobs:
         run: msbuild "Unspecified Error DOCX Recovery.sln" /p:Configuration=Release /p:Platform="Any CPU" /m
         continue-on-error: true
 
-      - name: Upload fresh Windows build (if produced)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-fresh-build
-          path: "Unspecified Error DOCX Recovery/bin/Release/Savvy DOCX Recovery.exe"
-          if-no-files-found: ignore
-
-  bundles:
-    name: Package all platform bundles
-    runs-on: ubuntu-latest
-    needs: [windows-build]
-    if: always()
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Download fresh Windows build (optional)
-        uses: actions/download-artifact@v4
-        with:
-          name: windows-fresh-build
-          path: fresh-windows
-        continue-on-error: true
-
       - name: Stage Windows bundle (prefer fresh build, fall back to prebuilt)
+        shell: bash
         run: |
           set -euo pipefail
           stage="dist-stage/windows"
           mkdir -p "$stage"
           cp -r "Unspecified Error DOCX Recovery/bin/Release/." "$stage/"
-          if [ -f "fresh-windows/Savvy DOCX Recovery.exe" ]; then
-            cp "fresh-windows/Savvy DOCX Recovery.exe" "$stage/"
-            echo "Using freshly built exe"
-          else
-            echo "Using prebuilt exe checked into repo"
-          fi
           cat > "$stage/INSTALL.txt" <<'EOF'
           Quick Word Recovr — Windows bundle
           ===================================
@@ -82,16 +57,47 @@ jobs:
           the source repository (Inno Setup).
           EOF
 
+      - name: Sign Windows binaries (Azure Trusted Signing)
+        uses: azure/trusted-signing-action@v0.5.1
+        with:
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          endpoint: ${{ secrets.AZURE_TRUSTED_SIGNING_ENDPOINT }}
+          trusted-signing-account-name: ${{ secrets.AZURE_TRUSTED_SIGNING_ACCOUNT }}
+          certificate-profile-name: ${{ secrets.AZURE_TRUSTED_SIGNING_PROFILE }}
+          files-folder: dist-stage/windows
+          files-folder-filter: exe,msi,dll
+          files-folder-recurse: true
+          file-digest: SHA256
+          timestamp-rfc3161: http://timestamp.acs.microsoft.com
+          timestamp-digest: SHA256
+
+      - name: Zip signed Windows bundle
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          Compress-Archive -Path dist-stage/windows/* -DestinationPath dist/quickwordrecovr-windows.zip -Force
+
+      - name: Upload signed Windows bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-signed-bundle
+          path: dist/quickwordrecovr-windows.zip
+          if-no-files-found: error
+
+  bundles:
+    name: Package non-Windows platform bundles
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref || github.ref }}
+
       - name: Build platform bundles
         run: |
           set -euo pipefail
           mkdir -p dist
-          # Windows: zip the staged native build directory.
-          (cd dist-stage/windows && zip -qr "../../dist/quickwordrecovr-windows.zip" .)
-
-          # All non-Windows platforms ship the same offline-capable PWA bundle;
-          # distinct names make discovery in the Releases UI obvious. Each
-          # archive is standalone — open index.html or install as a PWA.
           for plat in macos linux chromeos android ios web; do
             stage="dist-stage/${plat}"
             mkdir -p "$stage"
@@ -127,24 +133,28 @@ jobs:
           done
           ls -la dist/
 
-      - name: Upload all bundles
+      - name: Upload non-Windows bundles
         uses: actions/upload-artifact@v4
         with:
-          name: release-bundles
+          name: nonwindows-bundles
           path: dist/quickwordrecovr-*.zip
           if-no-files-found: error
 
   publish:
     name: Publish GitHub Release
-    needs: [bundles]
+    needs: [windows-build, bundles]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Download bundles
+      - name: Download signed Windows bundle
         uses: actions/download-artifact@v4
         with:
-          name: release-bundles
+          name: windows-signed-bundle
+          path: release
+
+      - name: Download non-Windows bundles
+        uses: actions/download-artifact@v4
+        with:
+          name: nonwindows-bundles
           path: release
 
       - name: List release files
@@ -159,13 +169,13 @@ jobs:
             echo "ref=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
           fi
 
-      - name: Create / update GitHub Release
+      - name: Create / update GitHub Release (replace existing assets)
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.tag.outputs.ref }}
           name: ${{ steps.tag.outputs.ref }}
           generate_release_notes: true
-          files: release/*.zip
+          files: release/quickwordrecovr-*.zip
           fail_on_unmatched_files: true
           body: |
             ## Quick Word Recovr — ${{ steps.tag.outputs.ref }}
@@ -174,7 +184,7 @@ jobs:
 
             | Platform | Asset |
             |---|---|
-            | Windows | `quickwordrecovr-windows.zip` (native VB.NET build + helper utilities) |
+            | Windows | `quickwordrecovr-windows.zip` (native VB.NET build + helper utilities, signed via Azure Trusted Signing) |
             | macOS | `quickwordrecovr-macos.zip` (PWA bundle) |
             | Linux | `quickwordrecovr-linux.zip` (PWA bundle) |
             | ChromeOS | `quickwordrecovr-chromeos.zip` (PWA bundle) |
@@ -185,3 +195,12 @@ jobs:
             All non-Windows bundles contain the same offline-capable web app.
             Open `index.html` directly or install it via your browser (see
             `INSTALL.txt` in each archive).
+
+      - name: Ensure latest assets are uploaded (clobber on re-run)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.tag.outputs.ref }}
+        run: |
+          set -euo pipefail
+          gh release upload "$TAG" release/quickwordrecovr-*.zip \
+            --repo "$GITHUB_REPOSITORY" --clobber

@@ -57,7 +57,8 @@
       <p>A <code>.docx</code> file is a ZIP archive of XML parts. When Word reports <em>"unspecified error"</em>, the
       most common cause is truncated or malformed XML in <code>word/document.xml</code>. This tool:</p>
       <ol>
-        <li>Unpacks the DOCX in memory using JSZip.</li>
+        <li>Unpacks the DOCX in memory using the in-house Immortal Inflater — a fault-tolerant
+        decompressor that recovers partial data from truncated or corrupt archives instead of failing.</li>
         <li>Validates <code>word/document.xml</code> with the browser's XML parser.</li>
         <li>If invalid, locates the last well-formed paragraph (<code>&lt;/w:p&gt;</code>) and rebuilds a clean
         document with proper closing tags.</li>
@@ -84,7 +85,7 @@
   </footer>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="immortal-inflate.js"></script>
 <script src="app.js"></script>
 <script>
 if ('serviceWorker' in navigator) {

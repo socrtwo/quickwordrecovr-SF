@@ -39,7 +39,9 @@ The web app does all of this **locally in your browser**. Files are never upload
 | **iOS / iPadOS**        | PWA bundle (`.zip`) / installable | Open the live app in Safari, then *Share → Add to Home Screen* |
 
 The web app works **fully offline** once installed — recovery runs in JavaScript
-using [JSZip](https://stuk.github.io/jszip/) and the browser's native XML parser.
+using the in-house **Immortal Inflater** (a fault-tolerant DEFLATE/ZIP reader that
+returns partial data from truncated or corrupt archives instead of throwing) and
+the browser's native XML parser.
 
 ## Repository layout
 

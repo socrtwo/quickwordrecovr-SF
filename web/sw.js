@@ -3,19 +3,19 @@
  * shell, network-first for everything else. Bumps the cache name on each
  * release so old assets get evicted.
  */
-const CACHE = 'qwr-v1';
+const CACHE = 'qwr-v2';
 const SHELL = [
   './',
   'index.html',
   'about.html',
   'app.css',
   'app.js',
+  'immortal-inflate.js',
   'manifest.webmanifest',
   'icons/icon.svg',
   'icons/icon-192.png',
   'icons/icon-512.png',
-  'icons/icon-maskable-512.png',
-  'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js'
+  'icons/icon-maskable-512.png'
 ];
 
 self.addEventListener('install', (event) => {

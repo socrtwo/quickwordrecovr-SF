@@ -25,6 +25,123 @@
 
   let lastUrls = [];
 
+  /* ---------- ZIP writer (replaces JSZip.generateAsync) ----------
+   * The Immortal Inflater only reads ZIPs, so we build the recovered DOCX
+   * ourselves: local file headers + central directory + EOCD. Entries are
+   * compressed with CompressionStream('deflate-raw') when available, else
+   * STORED (method 0). */
+  const SIG_LFH = 0x04034b50;
+  const SIG_CDH = 0x02014b50;
+  const SIG_EOCD = 0x06054b50;
+
+  const CRC_TABLE = (() => {
+    const t = new Uint32Array(256);
+    for (let i = 0; i < 256; i++) {
+      let c = i;
+      for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+      t[i] = c >>> 0;
+    }
+    return t;
+  })();
+
+  function crc32(bytes) {
+    let c = 0xFFFFFFFF;
+    for (let i = 0; i < bytes.length; i++) c = CRC_TABLE[(c ^ bytes[i]) & 0xFF] ^ (c >>> 8);
+    return (c ^ 0xFFFFFFFF) >>> 0;
+  }
+
+  async function deflateRaw(bytes) {
+    if (typeof CompressionStream === 'undefined') return null;
+    try {
+      const stream = new Response(new Blob([bytes]).stream().pipeThrough(new CompressionStream('deflate-raw')));
+      return new Uint8Array(await stream.arrayBuffer());
+    } catch (_) { return null; }
+  }
+
+  function dosTime(d) {
+    return ((d.getHours() & 0x1F) << 11) | ((d.getMinutes() & 0x3F) << 5) | ((d.getSeconds() >> 1) & 0x1F);
+  }
+  function dosDate(d) {
+    return (((d.getFullYear() - 1980) & 0x7F) << 9) | (((d.getMonth() + 1) & 0xF) << 5) | (d.getDate() & 0x1F);
+  }
+
+  // entries: object mapping name -> Uint8Array (uncompressed bytes)
+  async function buildZip(entries, mimeType) {
+    const now = new Date();
+    const time = dosTime(now), date = dosDate(now);
+    const enc = new TextEncoder();
+    const localChunks = [];
+    const cdChunks = [];
+    let offset = 0;
+
+    const names = Object.keys(entries);
+    for (const name of names) {
+      const raw = entries[name];
+      const nameBytes = enc.encode(name);
+      const compressed = await deflateRaw(raw);
+      const useStored = !compressed || compressed.length >= raw.length;
+      const data = useStored ? raw : compressed;
+      const method = useStored ? 0 : 8;
+      const crc = crc32(raw);
+
+      const lh = new Uint8Array(30 + nameBytes.length);
+      const lv = new DataView(lh.buffer);
+      lv.setUint32(0, SIG_LFH, true);
+      lv.setUint16(4, 20, true);
+      lv.setUint16(6, 0, true);
+      lv.setUint16(8, method, true);
+      lv.setUint16(10, time, true);
+      lv.setUint16(12, date, true);
+      lv.setUint32(14, crc, true);
+      lv.setUint32(18, data.length, true);
+      lv.setUint32(22, raw.length, true);
+      lv.setUint16(26, nameBytes.length, true);
+      lv.setUint16(28, 0, true);
+      lh.set(nameBytes, 30);
+      localChunks.push(lh, data);
+
+      const ch = new Uint8Array(46 + nameBytes.length);
+      const cv = new DataView(ch.buffer);
+      cv.setUint32(0, SIG_CDH, true);
+      cv.setUint16(4, 20, true);
+      cv.setUint16(6, 20, true);
+      cv.setUint16(8, 0, true);
+      cv.setUint16(10, method, true);
+      cv.setUint16(12, time, true);
+      cv.setUint16(14, date, true);
+      cv.setUint32(16, crc, true);
+      cv.setUint32(20, data.length, true);
+      cv.setUint32(24, raw.length, true);
+      cv.setUint16(28, nameBytes.length, true);
+      cv.setUint16(30, 0, true);
+      cv.setUint16(32, 0, true);
+      cv.setUint16(34, 0, true);
+      cv.setUint16(36, 0, true);
+      cv.setUint32(38, 0, true);
+      cv.setUint32(42, offset, true);
+      ch.set(nameBytes, 46);
+      cdChunks.push(ch);
+
+      offset += lh.length + data.length;
+    }
+
+    const cdSize = cdChunks.reduce((s, c) => s + c.length, 0);
+    const eocd = new Uint8Array(22);
+    const ev = new DataView(eocd.buffer);
+    ev.setUint32(0, SIG_EOCD, true);
+    ev.setUint16(4, 0, true);
+    ev.setUint16(6, 0, true);
+    ev.setUint16(8, names.length, true);
+    ev.setUint16(10, names.length, true);
+    ev.setUint32(12, cdSize, true);
+    ev.setUint32(16, offset, true);
+    ev.setUint16(20, 0, true);
+
+    return new Blob([...localChunks, ...cdChunks, eocd], {
+      type: mimeType || 'application/octet-stream'
+    });
+  }
+
   function revokeUrls() {
     for (const u of lastUrls) URL.revokeObjectURL(u);
     lastUrls = [];
@@ -153,26 +270,32 @@
     statusTitle.textContent = `Recovering ${file.name}`;
     log(`Loaded ${file.name} (${(file.size / 1024).toFixed(1)} KB).`, 'ok');
 
-    if (typeof JSZip === 'undefined') {
-      log('JSZip failed to load. Check your network or use the offline-installed PWA.', 'err');
+    if (typeof unzipImmortal === 'undefined') {
+      log('The Immortal Inflater (immortal-inflate.js) failed to load. Reload the page or use the offline-installed PWA.', 'err');
       return;
     }
 
-    let zip;
+    let files;
     try {
-      zip = await JSZip.loadAsync(file);
+      const u8 = new Uint8Array(await file.arrayBuffer());
+      ({ files } = unzipImmortal(u8));
     } catch (e) {
       log(`Not a valid ZIP/DOCX container: ${e.message || e}`, 'err');
       return;
     }
-    log('Unpacked DOCX archive.', 'ok');
+    const entryCount = Object.keys(files).length;
+    if (entryCount === 0) {
+      log('No recoverable entries found in the archive.', 'err');
+      return;
+    }
+    log(`Unpacked DOCX archive (${entryCount} entr${entryCount === 1 ? 'y' : 'ies'} recovered).`, 'ok');
 
-    const docEntry = zip.file('word/document.xml');
-    if (!docEntry) {
+    const docBytes = files['word/document.xml'];
+    if (!docBytes) {
       log('Missing word/document.xml — file may not be a Word document.', 'err');
       return;
     }
-    const originalXml = await docEntry.async('string');
+    const originalXml = new TextDecoder('utf-8', { fatal: false }).decode(docBytes);
     log(`Read word/document.xml (${originalXml.length.toLocaleString()} chars).`, 'ok');
 
     let finalXml = null;
@@ -204,8 +327,11 @@
     // Build recovered DOCX (only if we have valid XML to inject).
     if (finalXml) {
       try {
-        zip.file('word/document.xml', finalXml);
-        const blob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
+        files['word/document.xml'] = new TextEncoder().encode(finalXml);
+        const blob = await buildZip(
+          files,
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        );
         const url = URL.createObjectURL(blob);
         lastUrls.push(url);
         dlDocx.href = url;

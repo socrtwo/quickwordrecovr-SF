@@ -22,6 +22,7 @@
   const resetBtn = $('reset');
   const previewWrap = $('preview-wrap');
   const previewEl = $('preview');
+  const fileIdEl = $('s2-fileid');
 
   let lastUrls = [];
 
@@ -149,6 +150,7 @@
 
   function resetUI() {
     logEl.innerHTML = '';
+    fileIdEl.innerHTML = '';
     statusTitle.textContent = 'Working…';
     actions.classList.add('hidden');
     previewWrap.classList.add('hidden');
@@ -277,7 +279,23 @@
 
     let files;
     try {
-      const u8 = new Uint8Array(await file.arrayBuffer());
+      let u8 = new Uint8Array(await file.arrayBuffer());
+
+      // First step: identify the file by magic numbers and separate any
+      // embedded/concatenated foreign files before attempting DOCX recovery.
+      if (typeof S2FileID !== 'undefined') {
+        const report = S2FileID.analyze(u8, { programKey: 'quickwordrecovr', fileName: file.name });
+        S2FileID.renderPanel(fileIdEl, report);
+        log(`Identified as: ${report.primary.description}.`, report.mismatch ? 'warn' : 'ok');
+        if (report.mismatch) {
+          log('This does not look like a DOCX — see the recommendation above.', 'warn');
+        }
+        if (report.foreign.length) {
+          log(`Separated ${report.foreign.length} embedded/concatenated file(s) of a different type — download them above before continuing.`, 'warn');
+        }
+        u8 = report.proceedBytes;
+      }
+
       ({ files } = unzipImmortal(u8));
     } catch (e) {
       log(`Not a valid ZIP/DOCX container: ${e.message || e}`, 'err');
